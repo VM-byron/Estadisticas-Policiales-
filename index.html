@@ -1632,9 +1632,18 @@ library(sf)
 library(leaflet)</code></pre>
 <div id="lectura-de-datos" class="section level1">
 <h1>Lectura de datos</h1>
+<pre><code>estadisticas &lt;-
+  readxl::read_excel(&quot;estadisticaspoliciales2021.xls&quot;)</code></pre>
 </div>
 <div id="tabla" class="section level1">
 <h1>Tabla</h1>
+<p>```{r tabla}</p>
+<p>estadisticas %&gt;% dplyr::select(Delito, Fecha, Victima, Edad,
+Género, Provincia, Cantón) DT::datatable(colnames = c(“Delito”, “Fecha”,
+“Víctima”, “Edad”, “Género”, “Provincia”, “Cantón”), options =
+list(pageLength = 5, language = list(url =
+‘//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json’) ) )</p>
+<p>```</p>
 </div>
 
 
