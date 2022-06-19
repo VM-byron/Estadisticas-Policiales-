@@ -1,7 +1,7 @@
 ---
-title: "Estadísticas Policiales 2021"
+title: "Estadisticas policiales"
 author: "Byron Vargas Montero"
-date: '2022-06-15'
+date: '14-06-2022'
 output:
   html_document:
     code_folding: hide
@@ -15,43 +15,65 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 ```
-# Cargas de Paquetes
+
+
+# Preparativos
+
+
+
+## Carga de paquetes
+
+```{r carga-paquetes, message=FALSE}
 library(readr)
 library(dplyr)
+library(tidyr)
+library(lubridate)
 library(ggplot2)
 library(plotly)
-library(DT)
-library(sf)
-library(leaflet)
+```
+
+``` {r estadisticas-policiales, message=FALSE}
 ```
 
 
 # Lectura de datos
 
-```
-estadisticas <-
-  readxl::read_excel("estadisticaspoliciales2021.xls")
-```
+```{r lectura-datos, message=FALSE}
 
-
-# Tabla 
-
-
-```{r tabla}
-
-estadisticas %>%
-dplyr::select(Delito, Fecha, Victima, Edad, Género, Provincia, Cantón)
-DT::datatable(colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón"), options = list(pageLength = 5,
-language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
-)
-) 
-
+estadísticas <-
+  read_delim(
+    readxl::read_excel("estadisticaspoliciales2021.xls"),
+    delim = ";",
+    col_select = c("Delito", "Fecha", "Edad", "Género", "Provincia", "Cantón")
+  )
+  
 ```
 
 
+# Transformaciones
+
+```{r transformaciones-datos}
+estadísticas <-
+  bioestadísticas %>%
+  mutate(fecha = as.Date(fecha, format = "%Y-%m-%d")) %>%
+  arrange(fecha)
+```
+
+# Tabla de datos
+
+```
+estadísticas <-
+  datasets::estadisticas_policiales %>%
+  select(Delito, Fecha, Edad, Género, Provincia, Cantón)
 
 
+estadísticas %>%
+  datatable(options = list(
+    pageLength = 5,
+    language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
+  ))
+```
 
  
+

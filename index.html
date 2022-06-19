@@ -11,9 +11,8 @@
 
 <meta name="author" content="Byron Vargas Montero" />
 
-<meta name="date" content="2022-06-15" />
 
-<title>Estadísticas Policiales 2021</title>
+<title>Estadisticas policiales</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1614,36 +1613,51 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Estadísticas Policiales 2021</h1>
+<h1 class="title toc-ignore">Estadisticas policiales</h1>
 <h4 class="author">Byron Vargas Montero</h4>
-<h4 class="date">2022-06-15</h4>
+<h4 class="date">14-06-2022</h4>
 
 </div>
 
 
-<p>```{r setup, include=FALSE} knitr::opts_chunk$set(echo = TRUE)</p>
-<pre><code># Cargas de Paquetes
-library(readr)
-library(dplyr)
-library(ggplot2)
-library(plotly)
-library(DT)
-library(sf)
-library(leaflet)</code></pre>
+<p><code>{r setup, include=FALSE} knitr::opts_chunk$set(echo = TRUE)</code></p>
+<div id="preparativos" class="section level1">
+<h1>Preparativos</h1>
+<div id="carga-de-paquetes" class="section level2">
+<h2>Carga de paquetes</h2>
+<p><code>{r carga-paquetes, message=FALSE} library(readr) library(dplyr) library(tidyr) library(lubridate) library(ggplot2) library(plotly)</code></p>
+<p><code>{r estadisticas-policiales, message=FALSE}</code></p>
+</div>
+</div>
 <div id="lectura-de-datos" class="section level1">
 <h1>Lectura de datos</h1>
-<pre><code>estadisticas &lt;-
-  readxl::read_excel(&quot;estadisticaspoliciales2021.xls&quot;)</code></pre>
+<p>```{r lectura-datos, message=FALSE}</p>
+<p>estadísticas &lt;- read_delim(
+readxl::read_excel(“estadisticaspoliciales2021.xls”), delim = “;”,
+col_select = c(“Delito”, “Fecha”, “Edad”, “Género”, “Provincia”,
+“Cantón”) )</p>
+<pre><code>
+
+# Transformaciones
+
+```{r transformaciones-datos}
+estadísticas &lt;-
+  bioestadísticas %&gt;%
+  mutate(fecha = as.Date(fecha, format = &quot;%Y-%m-%d&quot;)) %&gt;%
+  arrange(fecha)</code></pre>
 </div>
-<div id="tabla" class="section level1">
-<h1>Tabla</h1>
-<p>```{r tabla}</p>
-<p>estadisticas %&gt;% dplyr::select(Delito, Fecha, Victima, Edad,
-Género, Provincia, Cantón) DT::datatable(colnames = c(“Delito”, “Fecha”,
-“Víctima”, “Edad”, “Género”, “Provincia”, “Cantón”), options =
-list(pageLength = 5, language = list(url =
-‘//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json’) ) )</p>
-<p>```</p>
+<div id="tabla-de-datos" class="section level1">
+<h1>Tabla de datos</h1>
+<pre><code>estadísticas &lt;-
+  datasets::estadisticas_policiales %&gt;%
+  select(Delito, Fecha, Edad, Género, Provincia, Cantón)
+
+
+estadísticas %&gt;%
+  datatable(options = list(
+    pageLength = 5,
+    language = list(url = &#39;//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json&#39;)
+  ))</code></pre>
 </div>
 
 
