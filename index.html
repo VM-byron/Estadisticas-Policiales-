@@ -11,8 +11,9 @@
 
 <meta name="author" content="Byron Vargas Montero" />
 
+<meta name="date" content="2022-06-15" />
 
-<title>Estadisticas policiales</title>
+<title>Estadísticas Policiales 2021</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1613,51 +1614,129 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Estadisticas policiales</h1>
+<h1 class="title toc-ignore">Estadísticas Policiales 2021</h1>
 <h4 class="author">Byron Vargas Montero</h4>
-<h4 class="date">14-06-2022</h4>
+<h4 class="date">2022-06-15</h4>
 
 </div>
 
 
-<p><code>{r setup, include=FALSE} knitr::opts_chunk$set(echo = TRUE)</code></p>
-<div id="preparativos" class="section level1">
-<h1>Preparativos</h1>
-<div id="carga-de-paquetes" class="section level2">
-<h2>Carga de paquetes</h2>
-<p><code>{r carga-paquetes, message=FALSE} library(readr) library(dplyr) library(tidyr) library(lubridate) library(ggplot2) library(plotly)</code></p>
-<p><code>{r estadisticas-policiales, message=FALSE}</code></p>
+<p>```{r setup, include=FALSE} knitr::opts_chunk$set(echo = TRUE)</p>
+<div id="descripción" class="section level1">
+<h1>Descripción</h1>
+<p>Esta es la segunda tarea del curso de Procesamientos de Datos
+Geográficos (GF-0604) la cual tiene como objetivo que cada estudiante
+realice a partir de las estadisticas policiales del 2021 tablas y
+gráficos interactivos para detallar ciertos aspectos requeridos por el
+docente en dichas tablas y gráficos. Estos datos fueron extraidos de la
+siguiente página del [Organismo de Investigación Judicial (OIJ)] (<a href="https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos" class="uri">https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos</a>)</p>
+<div id="carga-de-paquetes-a-emplear" class="section level2">
+<h2>Carga de paquetes a emplear</h2>
+<pre><code>library(ggplot2)
+library(readxl)
+library(plotly)
+library(dplyr)
+library(sf)
+library(DT)</code></pre>
+<pre><code>estadisticas &lt;-
+  read_excel(&quot;estadisticaspoliciales2021.xls&quot;)
+estadisticas = subset(
+  estadisticas,
+  select = c(
+    &quot;Delito&quot;,
+    &quot;Fecha&quot;,
+    &quot;Victima&quot;,
+    &quot;Edad&quot;,
+    &quot;Genero&quot;,
+    &quot;Provincia&quot;,
+    &quot;Canton&quot;
+  )
+)</code></pre>
 </div>
-</div>
-<div id="lectura-de-datos" class="section level1">
-<h1>Lectura de datos</h1>
-<p>```{r lectura-datos, message=FALSE}</p>
-<p>estadísticas &lt;- read_delim(
-readxl::read_excel(“estadisticaspoliciales2021.xls”), delim = “;”,
-col_select = c(“Delito”, “Fecha”, “Edad”, “Género”, “Provincia”,
-“Cantón”) )</p>
-<pre><code>
-
-# Transformaciones
-
-```{r transformaciones-datos}
-estadísticas &lt;-
-  bioestadísticas %&gt;%
-  mutate(fecha = as.Date(fecha, format = &quot;%Y-%m-%d&quot;)) %&gt;%
-  arrange(fecha)</code></pre>
-</div>
-<div id="tabla-de-datos" class="section level1">
-<h1>Tabla de datos</h1>
-<pre><code>estadísticas &lt;-
-  datasets::estadisticas_policiales %&gt;%
-  select(Delito, Fecha, Edad, Género, Provincia, Cantón)
-
-
-estadísticas %&gt;%
+<div id="tabla-de-datos" class="section level2">
+<h2><strong>Tabla de datos</strong></h2>
+<pre><code>estadisticas$Fecha = as.Date(estadisticas$Fecha)
+colnames(estadisticas) = c(&quot;Delito&quot;,
+                             &quot;Fecha&quot;,
+                             &quot;Víctima&quot;,
+                             &quot;Edad&quot;,
+                             &quot;Género&quot;,
+                             &quot;Provincia&quot;,
+                             &quot;Cantón&quot;)
+estadisticas %&gt;%
   datatable(options = list(
     pageLength = 5,
     language = list(url = &#39;//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json&#39;)
   ))</code></pre>
+</div>
+<div id="gráfico-de-cantidad-y-tipo-de-delitos" class="section level2">
+<h2>Gráfico de cantidad y tipo de delitos</h2>
+<p>Grafics &lt;- estadisticas %&gt;% count(Delito) %&gt;% ggplot(aes(x =
+order(n, Delito), y = Delito)) + geom_bar(stat = “identity”) +
+coord_flip() + ggtitle(“Cantidad de delitos según sea el tipo de delito
+en Costa Rica”) + xlab(“Cantidad delitos”) + ylab(“Delitos”)</p>
+<p>ggplotly(Grafics) %&gt;% config(locale = ‘es’)</p>
+<pre><code>
+## **Gráfico con la cantidad de delitos por mes** 
+
+```{r, Segundo gráfico, message=FALSE, warning=FALSE}  
+Graf2 &lt;-
+  estad_policial %&gt;% mutate(meses = lubridate::month(Fecha))
+nombres_estad &lt;-
+  c(
+    &quot;Enero&quot;,
+    &quot;Febrero&quot;,
+    &quot;Marzo&quot;,
+    &quot;Abril&quot;,
+    &quot;Mayo&quot;,
+    &quot;Junio&quot;,
+    &quot;Julio&quot;,
+    &quot;Agosto&quot;,
+    &quot;Septiembre&quot;,
+    &quot;Octubre&quot;,
+    &quot;Noviembre&quot;
+  )
+Graf2 &lt;-
+  Graf2 %&gt;%
+  count(meses) %&gt;%
+  ggplot(level = levelorder, (aes(
+    x = reorder(nombres_estad, meses), y = n
+  ))) +
+  geom_bar(stat = &quot;identity&quot;) +
+  ggtitle(&quot;Cantidad de delitos por mes&quot;) +
+  xlab(&quot;Meses&quot;) +
+  ylab(&quot;Cantidad de delitos&quot;)
+ggplotly (Graf2) %&gt;% 
+  config(locale = &#39;es&#39;)</code></pre>
+</div>
+<div id="gráfico-con-la-proporción-de-delitos-según-el-género" class="section level2">
+<h2><strong>Gráfico con la proporción de delitos según el
+género</strong></h2>
+<p>```{r, Tercer gráfico, message=FALSE, warning=FALSE}<br />
+Graf3 &lt;- estad_policial %&gt;% ggplot(aes(x = Delito, fill = Género))
++ geom_bar(position = “fill”) + coord_flip() + labs(fill = “Género”) +
+ggtitle(“Proporción de delitos según el género”) + xlab(“Tipo de
+delito”) + ylab(“Proporción”)</p>
+<p>ggplotly(Graf3) %&gt;% config(locale = ‘es’)</p>
+<pre><code>
+## **Gráfico con la cantidad de delitos en determinados cantones**  
+
+```{r, Cuarto gráfico, message=FALSE, warning=FALSE}  
+graf4 &lt;-
+  estad_policial %&gt;%
+  count(Cantón) %&gt;%
+  filter(Cantón == &quot;SAN JOSE&quot; |
+           Cantón == &quot;ALAJUELA&quot; |
+           Cantón == &quot;CARTAGO&quot; | 
+           Cantón == &quot;HEREDIA&quot;) %&gt;%
+  ggplot(aes(x = reorder(Cantón, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  ggtitle(&quot;Delitos en los cantones de San José, Alajuela, Cartago y Heredia&quot;) +
+  xlab(&quot;Cantón&quot;) +
+  ylab(&quot;Cantidad&quot;)
+ggplotly(graf4) %&gt;% 
+  config(locale = &#39;es&#39;)</code></pre>
+</div>
 </div>
 
 
